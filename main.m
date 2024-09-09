@@ -26,7 +26,7 @@ recompute = false; % when false, this code will not recompute data whose files a
 Parray = 1:125; % the library sizes to consider
 Pmax = max(Parray);
 
-S = 1; % the number of chaotic trajectories to compute
+S = 256; % the number of chaotic trajectories to compute
 R = 256; % the number of library permutations to compute
 
 Narray = 10.^(1:6); % the choatic trajectory durations to consider when computing weights
