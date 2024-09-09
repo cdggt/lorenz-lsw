@@ -6,6 +6,6 @@ All periodic orbits and their stabilities were computed by Viswanath; data is av
 
 ## running the code
 
-The code is run by executing `main.m`. Once this script finishes, it will plot the prediction error, Figure 2 from the paper, for each method. 
+The code is run by executing `main.m`. Once this script finishes, it will plot all figures in the paper and the table.
 
-This code computes the error of each weighting scheme for all library sizes `P`, permutations `R`, chaotic trajectories `S`, and durations `N` (as described in the paper). The user has the open to change what values of `P`, `R`, `N`, and `S` are used in the header of `main.m`. 
+This code computes the error of each weighting scheme for all library sizes `P`, permutations `R`, chaotic trajectories `S`, and durations `N` (as described in the paper). The user has the option to change the values of `P`, `R`, `N`, and `S` in the header of `main.m`. 

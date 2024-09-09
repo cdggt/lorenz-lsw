@@ -1,4 +1,7 @@
 function sample_prediction_errors(recompute,sampleIndex,Parray,Narray,permutations)
+%SAMPLE_PREDICTIONS_ERRORS this method computes takes the weights, which 
+% have been saves out, and computes E_rel for each weighting scheme, over 
+% each value of P, R, and N, at a specific value of S=sampleIndex. 
 
 filename = sprintf('./localdata/predictions/errors%g.mat',sampleIndex);
 
@@ -74,7 +77,6 @@ else
             predictions = mean(snippet_obs_averages(ind,:),1)';
             snippet_uniform_error(p,r,:) = abs(predictions-sample_means)./sample_stds;
 
-
             % for every sample duration
             for n = 1:N
 
@@ -103,7 +105,6 @@ else
         fprintf(str);
 
     end
-
 
     %% save out results so that they may be plotted
     filename = sprintf('./localdata/predictions/errors%g.mat',sampleIndex);

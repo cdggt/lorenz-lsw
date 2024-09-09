@@ -1,11 +1,6 @@
 function orbit_correlations(recompute,theta,Pmax)
 %COMPUTE_ORBIT_CORRELATIONS This method computes the measure correlation
-%matrix (Eq. 7 in the paper).
-%
-% Inputs:
-%
-%   theta           : value of variance to use for the Guassian kernal 
-%   Pmax            : the largest library size being used.
+%matrix, K_{pq}, of orbits. 
 
 filename = './localdata/orbits/lsw/correlations.mat';
 if isfile(filename)&&~recompute
@@ -36,7 +31,7 @@ for p = 1:Pmax
         % compute the integral of the Gaussian kernel 
         distance = pdist2(orbitp, orbitq);
         G = exp(-1/(4*theta).*distance.^2);
-        K(p,q) = fftmean(fftmean(G,2),1);
+        K(p,q) = compute.orbit_mean(compute.orbit_mean(G,2),1);
         
     end
     

@@ -1,12 +1,6 @@
 function sample_markov_snippet_weights(recompute,sampleNumber,Parray,Narray,permutations)
-%SAMPLE_MARKOV_SNIPPET_DISTANCES this method computes the distance
-% between each snippet and a sample of chaotic trajectory.
-%
-% Inputs:
-%
-%   sampleNumber    : integer describing which chaotic trajectory to
-%                   compute distances to
-%   Pmax            : the largest library size being used
+%SAMPLE_MARKOV_SNIPPET_WEIGHTS this method computes the Markov weights of 
+% snippets, for each P, R, and N, at a specific sample index S=sampleIndex. 
 
 filename = sprintf('localdata/snippets/markov/weights%g.mat',sampleNumber);
 if isfile(filename)&&~recompute

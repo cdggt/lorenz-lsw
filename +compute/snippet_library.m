@@ -1,10 +1,6 @@
 function snippet_library(Pmax,seed)
 %SNIPPET_LIBRARY This method computes a library of short chaotic
-%trajectories, i.e. snippets. For each periodic orbit reference in Parray,
-%this method will save a snippet of equal length. This method is NOT
-%designed to be intelligent, e.g., compute snippets that well cover the
-%chaotic attractor. It computes snippets at random, to show that the Least 
-% Squares Weighting can adjust to any snippet library.
+%trajectories, i.e. snippets, to match and compate with the orbit library.
 
 % Inputs:
 %
@@ -46,7 +42,7 @@ dt = totalDuration/N;
 % that this point settles onto the chaotic attractor before taking data
 X0 = [5*rand; 5*rand; 20];
 for i = 1:ceil(settlingTime/dt)
-    X0 = rk4(X0,dt);
+    X0 = lorenz_rk4(X0,dt);
 end
 
 % integrate a snippet that is equal in length to the orbit
@@ -55,7 +51,7 @@ X(:,1) = X0;
 t = zeros(N,1);
 for n = 1:N
 
-    X(:,n+1) = rk4(X(:,n),dt);
+    X(:,n+1) = lorenz_rk4(X(:,n),dt);
     t(n+1) = t(n)+dt;
 
 end

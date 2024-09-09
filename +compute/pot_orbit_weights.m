@@ -1,4 +1,8 @@
 function pot_orbit_weights(recompute,Parray,permutations)
+%POT_ORBIT_WEIGHTS this method computes the POT weights for each library
+%P_r. This method is mostly a wrapper for the function 
+% compute.unordered_pot_weights(ind), which actually computes the POT
+% weights
 
 filename = sprintf('localdata/orbits/pot/weights.mat');
 if isfile(filename)&&~recompute

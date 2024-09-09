@@ -1,11 +1,6 @@
 function snippet_correlations(recompute,theta,Pmax)
-%ORBIT_CORRELATIONS This method computes the measure correlation
-%matrix (Eq. 7 in the paper).
-%
-% Inputs:
-%
-%   theta           : value of variance to use for the Guassian kernal 
-%   Pmax            : the largest library size being used
+%SNIPPET_CORRELATIONS This method computes the measure correlation
+%matrix, K_{pq}, of snippets. 
 
 filename = './localdata/snippets/lsw/correlations.mat';
 if isfile(filename)&&~recompute
@@ -35,8 +30,7 @@ for p = 1:Pmax
         % compute the integral of the Gaussian kernel 
         distance = pdist2(snippetp, snippetq);
         G = exp(-1/(4*theta).*distance.^2);
-        [n,m] = size(G);
-        K(p,q) = trapz(trapz(G,2),1)/(n-1)/(m-1);
+        K(p,q) = compute.snippet_mean(compute.snippet_mean(G,2),1);
 
     end
 

@@ -1,5 +1,5 @@
-function m = fftmean(x,dim)
-%FFTMEAN This method computes the average of PERIODIC data x, over
+function m = snippet_mean(x,dim)
+%SNIPPET_MEAN This method computes the average of NONPERIODIC data x, over
 %dimension dim
 %
 % Inputs:
@@ -13,10 +13,6 @@ if nargin < 2
 end
 
 N = size(x,dim);
-m = fft(x,[],dim);
-S.subs = repmat({':'},1,ndims(m));
-S.subs{dim} = 1;
-S.type = '()';
-m = subsref(m,S)/N;
+m = trapz(x,dim)/(N-1);
 
 end

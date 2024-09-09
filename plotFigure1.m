@@ -42,7 +42,7 @@ if ~isfile(filename)||recompute
                 % compute the integral of the Gaussian kernel
                 distance = (orbitp.x-orbitq.x').^2+(orbitp.y-orbitq.y').^2+(orbitp.z-orbitq.z').^2;
                 G = exp(-1/(4*th).*distance);
-                K(p,q) = fftmean(fftmean(G,2),1);
+                K(p,q) = compute.orbit_mean(compute.orbit_mean(G,2),1);
 
             end
 
@@ -65,8 +65,7 @@ if ~isfile(filename)||recompute
                 % compute the integral of the Gaussian kernel
                 distance = (snippetp.x-snippetq.x').^2+(snippetp.y-snippetq.y').^2+(snippetp.z-snippetq.z').^2;
                 G = exp(-1/(4*th).*distance);
-                [n,m] = size(G);
-                K(p,q) = trapz(trapz(G,2),1)/(n-1)/(m-1);
+                K(p,q) = compute.snippet_mean(compute.snippet_mean(G,2),1);
 
             end
 

@@ -1,5 +1,5 @@
-function x = rk4(x,dt)
-%RK4 and 4th-order Runge-Kutta time stepping scheme for integrating the
+function x = lorenz_rk4(x,dt)
+%LORENZ_RK4 4th-order Runge-Kutta time stepping scheme for integrating the
 %1963 Lorenz dynamics.
 %
 % Inputs:

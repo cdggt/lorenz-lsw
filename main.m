@@ -49,7 +49,6 @@ compute.snippet_library(Pmax,seed);
 
 %% pick what value to use for the Gaussian kernel variance
 
-% plotFigure1(recompute)
 theta = 10^2;
 
 %% compute chaotic trajectories, and LSW, MARKOV, POT weights 
@@ -99,10 +98,8 @@ for sampleIndex = 1:S
     compute.sample_prediction_errors(recompute,sampleIndex,Parray,Narray,permutations);
 end
 
-%% plot results
+%% plot Figures
 
-plotFigure2(Parray, R, S, Narray)
-
-%%
-
+plotFigure1(recompute)
+plotFigure2(Parray, R, S, Narray);
 table = plotTable1(Parray, R, S, Narray);

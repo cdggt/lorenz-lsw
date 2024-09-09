@@ -3,13 +3,6 @@ function chaotic_sample(recompute,sampleNumber,seed,N)
 %the lorenz attractor. To make sure that everything in our manuscript is
 %reproducible, we computed all 256 sample trajectories at set seeds of the
 %matlab(r2023a)'s psuedorandom number generator.
-%
-% Inputs:
-%
-%   sampleNumber    : integer describing which chaotic trajectory to
-%                   compute
-%   seed            : seed for the random number generator
-%   N               : number of samples to save out per trajectory
 
 % only compute trajectory if it does not already exist
 filename = ['./localdata/chaos/',sprintf('sample%g',sampleNumber),'.mat'];
@@ -46,7 +39,7 @@ else
     fprintf('\t integrating onto the attractor...\n');
     x(:,1) = [5*rand; 5*rand; 20];
     for i = 1:ceil(settlingTime/timestep)
-        x(:,1) = rk4(x(:,1),timestep);
+        x(:,1) = lorenz_rk4(x(:,1),timestep);
     end
 
     % actually take data
@@ -57,7 +50,7 @@ else
 
         x(:,n) = x(:,n-1);
         for k = 1:dtPerReadout
-            x(:,n) = rk4(x(:,n),timestep);
+            x(:,n) = lorenz_rk4(x(:,n),timestep);
         end
         t(n) = t(n-1)+dtPerReadout*timestep;
 

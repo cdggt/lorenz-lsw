@@ -1,22 +1,6 @@
 function sample_lsw_orbit_weights(recompute,sampleNumber,Parray,Narray,permutations,theta)
-%SAMPLE_LSW_AVERAGES this method computes Eq. 11 from the
-%manuscript, i.e., the ergodic average of a_p(x), for each orbit p. In
-%particular, this method computes a_p(x) for every collection of orbits
-%specified by Parray, and for every integral duration specified by Narray.
-%This method computes these values over a single chaotic trajectory,
-%labelled by sampleNumber.
-%
-% Inputs:
-%
-%   sampleNumber    : integer describing which chaotic trajectory to
-%                   compute averages over
-%   theta           : value of variance to use for the Guassian kernal
-%   Parray          : array of library sizes of orbits to use. Each element
-%                   Parray is an integer 0<p<=1375. Parray must be
-%                   monotonically increasing.
-%   Narray          : array of durations uses to compute the integral in
-%                   time, in units of time steps. Narray must be
-%                   monotonically increasing.
+%SAMPLE_LSW_ORBIT_WEIGHTS this method computes the LSW weights of orbits,
+%for each P, R, and N, at a specific sample index S=sampleIndex. 
 
 filename = sprintf('localdata/orbits/lsw/weights%g.mat',sampleNumber);
 if isfile(filename)&&~recompute
@@ -43,7 +27,7 @@ else
         orbit =load(sprintf('data/orbits/orbit%g.mat',p));
 
         D = pdist2([orbit.x orbit.y orbit.z], sample);
-        ap = fftmean(exp(-1/(4*theta).*D.^2),1);
+        ap = compute.orbit_mean(exp(-1/(4*theta).*D.^2),1);
 
         ap = cumsum(ap);
         averages(p,:) = ap(Narray)./Narray;

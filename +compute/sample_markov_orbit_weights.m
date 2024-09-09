@@ -1,12 +1,6 @@
 function sample_markov_orbit_weights(recompute,sampleNumber,Parray,Narray,permutations)
-%SAMPLE_MARKOV_ORBIT_DISTANCES this method computes the distance
-% between each snippet and a sample of chaotic trajectory.
-%
-% Inputs:
-%
-%   sampleNumber    : integer describing which chaotic trajectory to
-%                   compute distances to
-%   Pmax            : the largest library size being used
+%SAMPLE_MARKOV_ORBIT_WEIGHTS this method computes the Markov weights of 
+% orbits, for each P, R, and N, at a specific sample index S=sampleIndex. 
 
 filename = sprintf('localdata/orbits/markov/weights%g.mat',sampleNumber);
 if isfile(filename)&&~recompute
@@ -38,7 +32,6 @@ for p = 1:Pmax
 end
 
 fprintf('computing orbit Markov weights for sample number %g...\n',sampleNumber)
-
 
 P = numel(Parray);
 R = size(permutations,2);
@@ -74,41 +67,3 @@ fprintf('saved results to `%s`\n',filename)
 end
 
 end
-
-% function sample_markov_orbit_distances(sampleNumber,Pmax)
-% %SAMPLE_MARKOV_ORBIT_DISTANCES this method computes the distance
-% % between each snippet and a sample of chaotic trajectory.
-% %
-% % Inputs:
-% %
-% %   sampleNumber    : integer describing which chaotic trajectory to
-% %                   compute distances to
-% %   Pmax            : the largest library size being used
-% 
-% % load in chaotic sample trajectory
-% sample = load(['./localdata/chaos/sample',num2str(sampleNumber),'.mat'],'x','y','z');
-% sample = [sample.x' sample.y' sample.z'];
-% 
-% fprintf('computing orbit distances to sample number %g...\n',sampleNumber)
-% 
-% % allocate memory for arrays
-% D = nan(Pmax,size(sample,1));
-% 
-% str = '';
-% for p = 1:Pmax
-% 
-%     orbit = load(sprintf('data/orbits/orbit%g.mat',p));
-%     D(p,:) = min(pdist2([orbit.x orbit.y orbit.z], sample),[],1);
-% 
-%     fprintf(repmat('\b',1,numel(str)));
-%     str = sprintf('\t %g / %g \n',p,Pmax);
-%     fprintf(str);
-% 
-% end
-% 
-% % save out data
-% filename = sprintf('localdata/orbits/markov/distances%g.mat',sampleNumber);
-% save(filename,'D');
-% fprintf('saved results to `%s`\n',filename)
-% 
-% end

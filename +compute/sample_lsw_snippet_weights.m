@@ -1,20 +1,6 @@
 function sample_lsw_snippet_weights(recompute,sampleNumber,Parray,Narray,permutations,theta)
-%SAMPLE_LSW_AVERAGES this method computes Eq. 11 from the
-%manuscript, i.e., the ergodic average of a_p(x), for each orbit p. In
-%particular, this method computes a_p(x) for every collection of orbits
-%specified by Parray, and for every integral duration specified by Narray.
-%This method computes these values over a single chaotic trajectory,
-%labelled by sampleNumber.
-%
-% Inputs:
-%
-%   sampleNumber    : integer describing which chaotic trajectory to
-%                   compute averages over
-%   theta           : value of variance to use for the Guassian kernal
-%   Pmax            : the largest library size being used
-%   Narray          : array of durations uses to compute the integral in
-%                   time, in units of time steps. Narray must be
-%                   monotonically increasing.
+%SAMPLE_LSW_SNIPPET_WEIGHTS this method computes the LSW weights of snippets,
+%for each P, R, and N, at a specific sample index S=sampleIndex. 
 
 filename = sprintf('localdata/snippets/lsw/weights%g.mat',sampleNumber);
 if isfile(filename)&&~recompute
@@ -41,7 +27,7 @@ else
         snippet = load(sprintf('localdata/snippets/snippet%g.mat',p));
 
         D = pdist2([snippet.x snippet.y snippet.z], sample);
-        ap = trapz(exp(-1/(4*theta).*D.^2),1)/(numel(snippet.x)-1);
+        ap = compute.snippet_mean(exp(-1/(4*theta).*D.^2),1);
 
         ap = cumsum(ap);
         averages(p,:) = ap(Narray)./Narray;
