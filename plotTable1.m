@@ -26,7 +26,7 @@ for s = 1:S
 
         table(:,1) = median(orbit_pot_error,1)';
         table(:,2) = median(orbit_uniform_error,1)';
-        table(:,3) = median(snippet_uniform_error,1)';
+        table(:,5) = median(snippet_uniform_error,1)';
 
     end
 
@@ -42,9 +42,9 @@ for s = 1:S
 
 end
 
-table(:,4) = median(reshape(permute(orbit_markov_error,[2 1 3]),Nobs,[]),2);
-table(:,5) = median(reshape(permute(snippet_markov_error,[2 1 3]),Nobs,[]),2);
-table(:,6) = median(reshape(permute(orbit_lsw_error,[2 1 3]),Nobs,[]),2);
+table(:,3) = median(reshape(permute(orbit_markov_error,[2 1 3]),Nobs,[]),2);
+table(:,4) = median(reshape(permute(orbit_lsw_error,[2 1 3]),Nobs,[]),2);
+table(:,6) = median(reshape(permute(snippet_markov_error,[2 1 3]),Nobs,[]),2);
 table(:,7) = median(reshape(permute(snippet_lsw_error,[2 1 3]),Nobs,[]),2);
 
 Erel = log10(table);
@@ -54,10 +54,10 @@ Erel = log10(table);
 figure;
 setlatexlabels
 
-heatmap(round(Erel,2));
+heatmap(round(Erel,1));
 ax = gca;
 ax.YData = {"$1$","$x$","$y$","$z$","$x^2$","$xy$","$xz$","$y^2$","$yz$","$z^2$","$\lambda$"};
-ax.XData = {"POT$_{o}$", "Uniform$_{o}$","Uniform$_{s}$","Markov$_{o}$","Markov$_{s}$","LSW$_{o}$","LSW$_{s}$"};
+ax.XData = {"POT${}_{orbits}$", "Uniform${}_{orbits}$","Markov${}_{orbits}$","LSW${}_{orbits}$","Markov${}_{snippets}$","Uniform${}_{snippets}$","LSW${}_{snippets}$"};
 ax.Title = '$\log(E_\textrm{rel})$';
 ax.Interpreter='latex';
 colormap(summer)

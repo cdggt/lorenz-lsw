@@ -19,6 +19,10 @@ mkdir localdata/predictions
 
 recompute = false; % when false, this code will not recompute data whose files already exist in ./localdata
 
+% NOTE: While this script computes the data on a single process, in series,
+% the data for the paper was computed in parallel on a cluster. There is a
+% lot being computed, so this script may take a long time to run. 
+
 %% define parameters
 
 % Define P,R,S,and N. see README. 
@@ -26,7 +30,7 @@ recompute = false; % when false, this code will not recompute data whose files a
 Parray = 1:125; % the library sizes to consider
 Pmax = max(Parray);
 
-S = 1; % the number of chaotic trajectories to compute
+S = 256; % the number of chaotic trajectories to compute
 R = 256; % the number of library permutations to compute
 
 Narray = 10.^(1:6); % the choatic trajectory durations to consider when computing weights
@@ -57,6 +61,9 @@ theta = 10^2;
 compute.orbit_correlations(recompute,theta,Pmax); % orbits 
 compute.snippet_correlations(recompute,theta,Pmax); % snippets
 
+% compute periodic orbit weights
+compute.pot_orbit_weights(recompute,Parray,permutations);
+
 for sampleIndex = 1:S
 
     % compute a sample chaotic trajectory
@@ -71,7 +78,6 @@ for sampleIndex = 1:S
     compute.sample_markov_snippet_weights(recompute,sampleIndex,Parray,Narray,permutations); % snippets
 
 end
-compute.pot_orbit_weights(recompute,Parray,permutations);
 
 %% compute test observable averages, as well as the Lyapunov exponent
 
@@ -100,6 +106,7 @@ end
 
 %% plot Figures
 
-plotFigure1(recompute)
+plotFigure0(recompute);
+plotFigure1(recompute);
 plotFigure2(Parray, R, S, Narray);
-table = plotTable1(Parray, R, S, Narray);
+plotTable1(Parray, R, S, Narray);
