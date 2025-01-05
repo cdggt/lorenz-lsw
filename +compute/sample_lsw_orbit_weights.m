@@ -106,7 +106,7 @@ beq = 1;
 lb = zeros(n, 1);
 
 % Solve using fmincon
-options = optimoptions('fmincon', 'Algorithm', 'sqp','MaxFunctionEvaluations',1e5,'OptimalityTolerance',1e-10);
+options = optimoptions('fmincon', 'Algorithm', 'sqp','MaxFunctionEvaluations',1e3,'OptimalityTolerance',1e-6,'Display','off');
 w = fmincon(objective, guess, [], [], Aeq, beq, lb, [], [], options);
 
 end
