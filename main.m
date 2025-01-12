@@ -106,7 +106,8 @@ end
 
 %% plot Figures
 
-plotFigure0(recompute);
 plotFigure1(recompute);
-plotFigure2(Parray, R, S, Narray);
+plotFigure2(recompute);
+plotFigure3(Parray, R, S, Narray);
+plotFigure4(Parray, R, S, Narray);
 plotTable1(Parray, R, S, Narray);

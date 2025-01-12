@@ -5,7 +5,7 @@ function sample_markov_snippet_weights(recompute,sampleNumber,Parray,Narray,perm
 filename = sprintf('localdata/snippets/markov/weights%g.mat',sampleNumber);
 if isfile(filename)&&~recompute
 
-    fprintf('orbit markov weights for sample %g already exists. \n',sampleNumber);
+    fprintf('snippet markov weights for sample %g already exists. \n',sampleNumber);
 
 else
 
