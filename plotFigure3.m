@@ -18,12 +18,14 @@ for s = 1:S
     obj=load(sprintf('localdata/predictions/errors%g.mat',s));
 
     if s==1
+        orbit_pot_error = max(obj.orbit_pot_error(:,:,1:end-1),[],3); % *_error(:,:,end) is the lyapunov exp err. Lets throw away this obs to compute E_max over \mathcal{B}
+        orbit_pot_error = orbit_pot_error(:,1); % look only at the ordered library P_r = {1,...,P}. 
+
         orbit_uniform_error   = max(obj.orbit_uniform_error(:,:,1:end-1),[],3);
-        orbit_pot_error       = max(obj.orbit_pot_error(:,:,1:end-1),[],3);
         snippet_uniform_error = max(obj.snippet_uniform_error(:,:,1:end-1),[],3);
     end
 
-    orbit_lsw_error(:,:,:,s)    = max(obj.orbit_lsw_tikhonov_error(:,:,:,1:end-1),[],4);
+    orbit_lsw_error(:,:,:,s)    = max(obj.orbit_lsw_tikhonov_error(:,:,:,1:end-1),[],4); % *_error(:,:,:,end) is the lyapunov exp err. Lets throw away this obs to compute E_max over \mathcal{B}
     orbit_markov_error(:,:,:,s) = max(obj.orbit_markov_error(:,:,:,1:end-1),[],4);
 
     snippet_lsw_error(:,:,:,s)    = max(obj.snippet_lsw_tikhonov_error(:,:,:,1:end-1),[],4);
@@ -49,6 +51,8 @@ line_ycrds = {
     10^(-0.15)*line_xcrds{3}.^(-1/2),
     10^(0.40)*line_xcrds{4}.^(-1/2)
 };
+
+complete_libraries = [1 3 6 12 21 39 69 125];
 
 %% define plotting parameters
 
@@ -76,13 +80,16 @@ set(groot,'DefaultTextInterpreter','latex')
 set(groot,'DefaultLegendInterpreter','latex')
 
 % plot performance over N for fixed P
-[~,p] = min(abs(Parray-5));
+[~,p] = min(abs(Parray-6));
 subplot(1,2,1);
 
-plot_center_and_spread(Narray,repmat(orbit_pot_error(p,:),[numel(Narray),1]),palette{1},.7,':');
+% plot_center_and_spread(Narray,repmat(orbit_pot_error(p,:),[numel(Narray),1]),palette{1},.7,':');
 plot_center_and_spread(Narray,repmat(orbit_uniform_error(p,:),[numel(Narray),1]),palette{2},.7,'-.');
 plot_center_and_spread(Narray,permute(orbit_markov_error(p,:,:,:),[3 2 4 1]),palette{3},.7,'--');
 plot_center_and_spread(Narray,permute(orbit_lsw_error(p,:,:,:),[3 2 4 1]),palette{4},.5,'-');
+
+[~,q] = min(abs(complete_libraries-6));
+yline(orbit_pot_error(complete_libraries(q)),'color',hex2rgb(palette{1}),'LineWidth',2);
 
 plot(line_xcrds{1},line_ycrds{1},'k-','LineWidth',2)
 
@@ -107,10 +114,13 @@ text(xcrd,10^(-3.6),['$P=',num2str(Parray(p)),'$'],'Interpreter','latex','FontSi
 [~,p] = min(abs(Parray-125));
 subplot(1,2,2);
 
-plot_center_and_spread(Narray,repmat(orbit_pot_error(p,:),[numel(Narray),1]),palette{1},.7,':');
+% plot_center_and_spread(Narray,repmat(orbit_pot_error(p,:),[numel(Narray),1]),palette{1},.7,':');
 plot_center_and_spread(Narray,repmat(orbit_uniform_error(p,:),[numel(Narray),1]),palette{2},.7,'-.');
 plot_center_and_spread(Narray,permute(orbit_markov_error(p,:,:,:),[3 2 4 1]),palette{3},.7,'--');
 plot_center_and_spread(Narray,permute(orbit_lsw_error(p,:,:,:),[3 2 4 1]),palette{4},.5,'-');
+
+[~,q] = min(abs(complete_libraries-125));
+yline(orbit_pot_error(complete_libraries(q)),'color',hex2rgb(palette{1}),'LineWidth',2);
 
 plot(line_xcrds{2},line_ycrds{2},'k-','LineWidth',2)
 
@@ -148,10 +158,12 @@ cmap = lines(8);
 [~,n] = min(abs(Narray-10^3));
 subplot(1,2,1);
 
-plot_center_and_spread(Parray,orbit_pot_error,palette{1},.7,':');
+% plot_center_and_spread(Parray,orbit_pot_error,palette{1},.7,':');
 plot_center_and_spread(Parray,orbit_uniform_error,palette{2},.7,'-.');
 plot_center_and_spread(Parray,permute(orbit_markov_error(:,:,n,:),[1 2 4 3]),palette{3},.7,'--');
 plot_center_and_spread(Parray,permute(orbit_lsw_error(:,:,n,:),[1 2 4 3]),palette{4},.5,'-');
+
+scatter(complete_libraries,orbit_pot_error(complete_libraries),60,'d','filled','CData',hex2rgb(palette{1}),'LineWidth',2);
 
 % format axis
 set(gca,'YScale','log','Xscale','log');
@@ -173,10 +185,12 @@ text(xcrd,10^(-3.6),['$N=10^',num2str(log10(Narray(n))),'$'],'Interpreter','late
 [~,n] = min(abs(Narray-10^6));
 subplot(1,2,2);
 
-plot_center_and_spread(Parray,orbit_pot_error,palette{1},.7,':');
+% plot_center_and_spread(Parray,orbit_pot_error,palette{1},.7,':');
 plot_center_and_spread(Parray,orbit_uniform_error,palette{2},.7,'-.');
 plot_center_and_spread(Parray,permute(orbit_markov_error(:,:,n,:),[1 2 4 3]),palette{3},.7,'--');
 plot_center_and_spread(Parray,permute(orbit_lsw_error(:,:,n,:),[1 2 4 3]),palette{4},.5,'-');
+
+scatter(complete_libraries,orbit_pot_error(complete_libraries),60,'d','filled','CData',hex2rgb(palette{1}),'LineWidth',2);
 
 % format axis
 set(gca,'YScale','log','Xscale','log');
