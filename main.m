@@ -1,6 +1,8 @@
 close all
 clear all
 
+%% make folder structure 
+
 mkdir localdata
 mkdir media
 
@@ -23,16 +25,31 @@ recompute = false; % when false, this code will not recompute data whose files a
 
 % Define P,R,S,and N. see README. 
 
-Parray = 1:125; % the library sizes to consider
-Pmax = max(Parray);
-
+Parray = 1:125; % the library sizes to consider when computing weights
 S = 256; % the number of chaotic trajectories to compute
 R = 256; % the number of library permutations to compute
-
 Narray = 10.^(1:6); % the choatic trajectory durations to consider when computing weights
+
+Pmax = 125;
+Nmax = max(Narray);
 
 seed = 123; % this is the seed we used to generate the values in the paper
 rng(seed);
+
+observables = { % define the functions in \mathcal{B}
+    @(x,y,z) ones(size(x)),...
+    @(x,y,z) x, ...
+    @(x,y,z) y, ...
+    @(x,y,z) z, ...
+    @(x,y,z) x.*x, ...
+    @(x,y,z) x.*y, ...
+    @(x,y,z) x.*z, ...
+    @(x,y,z) y.*y, ...
+    @(x,y,z) y.*z, ...
+    @(x,y,z) z.*z ...
+    % the lyapunov exponent will automatically be appended as an
+    % "observable" to this list.
+};
 
 %% compute the library permutations, {P_r}, explicitly 
 
@@ -57,10 +74,13 @@ theta = 10^2;
 compute.orbit_correlations(recompute,theta,Pmax); % orbits 
 compute.snippet_correlations(recompute,theta,Pmax); % snippets
 
+% compute periodic orbit weights
+compute.pot_orbit_weights(recompute,Parray,permutations);
+
 for sampleIndex = 1:S
 
     % compute a sample chaotic trajectory
-    compute.chaotic_sample(recompute,sampleIndex,seed,max(Narray));
+    compute.chaotic_sample(recompute,sampleIndex,seed,Nmax);
 
     % compute lsw weights, for this sample, over all p in Parray, n in Narray, and r = 1,...,R
     compute.sample_lsw_orbit_weights(recompute,sampleIndex,Parray,Narray,permutations,theta); % orbits
@@ -71,24 +91,9 @@ for sampleIndex = 1:S
     compute.sample_markov_snippet_weights(recompute,sampleIndex,Parray,Narray,permutations); % snippets
 
 end
-compute.pot_orbit_weights(recompute,Parray,permutations);
 
 %% compute test observable averages, as well as the Lyapunov exponent
 
-observables = {
-    @(x,y,z) ones(size(x)),...
-    @(x,y,z) x, ...
-    @(x,y,z) y, ...
-    @(x,y,z) z, ...
-    @(x,y,z) x.*x, ...
-    @(x,y,z) x.*y, ...
-    @(x,y,z) x.*z, ...
-    @(x,y,z) y.*y, ...
-    @(x,y,z) y.*z, ...
-    @(x,y,z) z.*z ...
-    % compute.observable_averages will also append the lyapunov exponent
-    % "observable" to this list.
-};
 compute.observable_averages(recompute,observables,Pmax,S)
 
 %% compute E_max and E_rel for each test observable, over each trajectory
@@ -100,6 +105,8 @@ end
 
 %% plot Figures
 
-plotFigure1(recompute)
-plotFigure2(Parray, R, S, Narray);
-table = plotTable1(Parray, R, S, Narray);
+plotFigure1(recompute);
+plotFigure2(recompute);
+plotFigure3(Parray, R, S, Narray);
+plotFigure4(Parray, R, S, Narray);
+plotTable1(Parray, R, S, Narray);

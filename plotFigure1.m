@@ -1,117 +1,149 @@
 function plotFigure1(recompute)
 
 filename = './localdata/fig1.mat';
-if ~isfile(filename)||recompute
-
-    theta = logspace(-1,5,7*4); % the range of theta to investigate
-    N = numel(theta);
-    P = 30; % the library size to investiage
-
-    Ko = zeros(P,P,N); % the orbit correlation matrix, K_pq^o
-    Ks = zeros(P,P,N); % the snippet correlation matrix, K_pq^s
-    K = zeros(P); % a temporary matrix to let the PARFOR loop to work
-
-    deyeo = zeros(N,1); % the distance of K_pq^o to the identity matrix
-    deyes = zeros(N,1); % the distance of K_pq^s to the identity matrix
-    doneo = zeros(N,1); % the distance of K_pq^o to the matrix of ones
-    dones = zeros(N,1); % the distance of K_pq^s to the matrix of ones
-
-    On = ones(P); % the identity matrix
-    Id = eye(P); % the matrix of ones
-
-
-    %% compute data
+if ~isfile(filename)||(nargin>0&&recompute)
 
     fprintf('computing data for figure 1...\n');
 
-    str='';
-    for i=1:N
+    % kernel variance 
+    theta = 1^2; % produces a more visual/didactic plot than the optimal value, theta=10^2. 
 
-        th = theta(i);
+    % decide grid over which to plot functions. Larger/Denser grids are more
+    % computationally expensive. We are marginalizing over y, so it does
+    % not appear in this script.
+    x = linspace(-30, 30,600/2); 
+    z = linspace(0, 50,500/2);
+    [X,Z] = ndgrid(x,z);
+    
+    % Compute orbit density
+    p = 19;
+    orbit = load(sprintf('data/orbits/orbit%g.mat',p));
+    orbit_trajectory = [orbit.x orbit.y orbit.z];
+    T = size(orbit_trajectory,1);
+    rho_p = zeros(numel(x),numel(z));
+    for t = 1:T
+        G = exp(-((orbit_trajectory(t,1)-X).^2+(orbit_trajectory(t,3)-Z).^2)/(4*theta));
+        rho_p = rho_p+G;
+    end
 
-        % orbits
-        for p = 1:P
+    % Compute chaotic density and histogram
+    rho = zeros(numel(x),numel(z));
+    histogram = zeros(numel(x),numel(z));
+    for n = 1:50
+        chaos = load(sprintf('localdata/chaos/sample%g.mat',n));
+        chaotic_trajectory = cat(1,[chaos.x' chaos.y' chaos.z']);
+        T = size(chaotic_trajectory,1);
+        for t = 1:T
 
-            % load in data of orbit p
-            orbitp =load(sprintf('./data/orbits/orbit%g.mat',p));
-            parfor q = p:P
+            G = exp(-((chaotic_trajectory(t,1)-X).^2+(chaotic_trajectory(t,3)-Z).^2)/(4*theta));
+            rho = rho+G;
 
-                % load in data of orbit p
-                orbitq =load(sprintf('./data/orbits/orbit%g.mat',q));
-
-                % compute the integral of the Gaussian kernel
-                distance = (orbitp.x-orbitq.x').^2+(orbitp.y-orbitq.y').^2+(orbitp.z-orbitq.z').^2;
-                G = exp(-1/(4*th).*distance);
-                K(p,q) = compute.orbit_mean(compute.orbit_mean(G,2),1);
-
-            end
-
-        end
-        % compute Frobenius distances
-        Ko(:,:,i) = K+K'-diag(diag(K));
-        deyeo(i) = norm(Ko(:,:,i)-Id);
-        doneo(i) = norm(Ko(:,:,i)-On);
-
-        % snippets
-        for p = 1:P
-
-            % load in data of snippet p
-            snippetp =load(sprintf('./localdata/snippets/snippet%g.mat',p));
-            parfor q = p:P
-
-                % load in data of snippet p
-                snippetq =load(sprintf('./localdata/snippets/snippet%g.mat',q));
-
-                % compute the integral of the Gaussian kernel
-                distance = (snippetp.x-snippetq.x').^2+(snippetp.y-snippetq.y').^2+(snippetp.z-snippetq.z').^2;
-                G = exp(-1/(4*th).*distance);
-                K(p,q) = compute.snippet_mean(compute.snippet_mean(G,2),1);
-
-            end
+            dist = pdist2([X(:) Z(:)], [chaotic_trajectory(t,1) chaotic_trajectory(t,3)]);
+            [~,i] = min(dist);
+            histogram(i) = histogram(i)+1;
 
         end
-        % compute Frobenius distances
-        Ks(:,:,i) = K+K'-diag(diag(K));
-        deyes(i) = norm(Ks(:,:,i)-Id);
-        dones(i) = norm(Ks(:,:,i)-On);
-
-        fprintf(repmat('\b',1,numel(str)));
-        str = sprintf('\t %g / %g \n',i,N);
-        fprintf(str);
-
-        save(filename,'theta','P','doneo','deyeo','dones','deyes');
 
     end
+    
+    % Compute chaotic density and histogram
+    chaotic_trajectory = [5*rand; 5*rand; 20];
+    timestep = 2e-3;
+    for i = 1:1000
+        chaotic_trajectory(:,1) = lorenz_rk4(chaotic_trajectory(:,1),timestep);
+    end
+
+    T = 2267; % this makes the chaotic snippet the same length as orbit 19
+    for t = 2:T
+        chaotic_trajectory(:,t) = lorenz_rk4(chaotic_trajectory(:,t-1),timestep);
+    end
+    chaotic_trajectory = chaotic_trajectory';
+
+    save(filename,'x','z','rho','rho_p','histogram','orbit_trajectory','chaotic_trajectory');
 
 else
 
-    load(filename,'theta','P','doneo','deyeo','dones','deyes');
+    load(filename,'x','z','rho','rho_p','histogram','orbit_trajectory','chaotic_trajectory');
 
 end
 
-%% plot data
+%% plot panels
+
+lw = 2;
+fs = 24;
+
 figure
 setlatexlabels
-
-clr = {'#648FFF','#785EF0','#DC267F','#FE6100','#FFB000'};
-
-p1 = plot(log10(theta),doneo/P,':','LineWidth',3,'color',clr{1});
-hold on;
-p2 = plot(log10(theta),deyeo/P,'LineWidth',2,'color',clr{4});
-plot(log10(theta),dones/P,'o','Color',p1.Color,'LineWidth',2,'MarkerSize',10);
-plot(log10(theta),deyes/P,'x','Color',p2.Color,'LineWidth',3,'MarkerSize',10);
-
-xline(2,'k-','LineWidth',1);
-yticks([0 1]);
-yticklabels({'0','1'});
-ylim([0 1]);
-xlim([-1 5]);
-xlabel('$\log_{10}\theta$','Interpreter','latex');
-ylabel('$P^{-1}\| \ \cdot \ \|_\textrm{F}$','Interpreter','latex');
+imagesc(rho_p',XData=x,YData=z); 
+set(gca,'ydir','normal');
+colormap(flip(bone));
+hold on
+plot(orbit_trajectory([1:end 1],1),orbit_trajectory([1:end 1],3),'r','LineWidth',lw);
+xlabel('$x$','Interpreter','latex');
+ylabel('$z$','Interpreter','latex');
 set(gcf,'color','w');
-set(gca,'fontsize',30);
+set(gca,'fontsize',fs);
+axis equal
+ylim([0 50]);
+xlim([-25 25]);
+xticks([-20 0 20]);
+yticks([0 25 50]);
 
-exportgraphics(gcf,'media/fig1.pdf');
+exportgraphics(gcf,'media/fig1a.pdf');
+
+dir = diff(chaotic_trajectory(1:2,:));
+angle = atan2(dir(3),dir(1));
+th = [0 2*pi/3 4*pi/3]+angle;
+r = 1;
+pts0 = [chaotic_trajectory(1,1)+r*sin(th); chaotic_trajectory(1,3)+r*cos(th);];
+dir = diff(chaotic_trajectory(end-1:end,:));
+angle = atan2(dir(3),dir(1));
+th = [0 2*pi/3 4*pi/3]+angle;
+r = 1;
+pts1 = [chaotic_trajectory(end,1)+r*sin(th); chaotic_trajectory(end,3)+r*cos(th);];
+
+figure
+setlatexlabels
+imagesc(rho',XData=x,YData=z); 
+set(gca,'ydir','normal');
+colormap(flip(bone));
+hold on
+k=10;
+plot(chaotic_trajectory(:,1),chaotic_trajectory(:,3),'r','LineWidth',lw);
+fill(pts0(1,[1:end 1]),pts0(2,[1:end 1]),'r','EdgeColor','none');
+fill(pts1(1,[1:end 1]),pts1(2,[1:end 1]),'r','EdgeColor','none');
+xlabel('$x$','Interpreter','latex');
+% ylabel('$z$','Interpreter','latex');
+set(gcf,'color','w');
+set(gca,'fontsize',fs);
+axis equal;
+ylim([0 50]);
+xlim([-25 25]);
+xticks([-20 0 20]);
+yticks([]);
+
+exportgraphics(gcf,'media/fig1b.pdf');
+
+figure
+setlatexlabels
+imagesc(histogram',XData=x,YData=z); 
+set(gca,'ydir','normal');
+colormap(flip(bone));
+hold on
+% plot(chaotic_trajectory(:,1),chaotic_trajectory(:,3),'r','LineWidth',lw);
+% fill(pts0(1,[1:end 1]),pts0(2,[1:end 1]),'r','EdgeColor','none');
+% fill(pts1(1,[1:end 1]),pts1(2,[1:end 1]),'r','EdgeColor','none');
+xlabel('$x$','Interpreter','latex');
+% ylabel('$z$','Interpreter','latex');
+set(gcf,'color','w');
+set(gca,'fontsize',fs);
+axis equal;
+ylim([0 50]);
+xlim([-25 25]);
+xticks([-20 0 20]);
+yticks([]);
+
+exportgraphics(gcf,'media/fig1c.pdf');
 
 end
 

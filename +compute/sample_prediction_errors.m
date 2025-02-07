@@ -29,14 +29,18 @@ else
     R = size(permutations,2);
     P = numel(Parray);
 
-    orbit_lsw_error    = nan(P,R,N,nObs);
-    orbit_markov_error = nan(P,R,N,nObs);
-    orbit_uniform_error= nan(P,R,nObs);
-    orbit_pot_error    = nan(P,R,nObs);
+    orbit_lsw_tikhonov_error= nan(P,R,N,nObs);
+    orbit_lsw_convex1_error = nan(P,R,N,nObs);
+    orbit_lsw_convex2_error = nan(P,R,N,nObs);
+    orbit_markov_error      = nan(P,R,N,nObs);
+    orbit_uniform_error     = nan(P,R,nObs);
+    orbit_pot_error         = nan(P,R,nObs);
 
-    snippet_lsw_error    = nan(P,R,N,nObs);
-    snippet_markov_error = nan(P,R,N,nObs);
-    snippet_uniform_error= nan(P,R,nObs);
+    snippet_lsw_tikhonov_error= nan(P,R,N,nObs);
+    snippet_lsw_convex1_error = nan(P,R,N,nObs);
+    snippet_lsw_convex2_error = nan(P,R,N,nObs);
+    snippet_markov_error      = nan(P,R,N,nObs);
+    snippet_uniform_error     = nan(P,R,nObs);
 
     %% load in weights
 
@@ -45,12 +49,10 @@ else
     orbit_markov_weights = load(sprintf('./localdata/orbits/markov/weights%g.mat',sampleIndex));
     orbit_markov_weights = orbit_markov_weights.w;
     orbit_lsw_weights = load(sprintf('./localdata/orbits/lsw/weights%g.mat',sampleIndex));
-    orbit_lsw_weights = orbit_lsw_weights.w;
 
     snippet_markov_weights = load(sprintf('./localdata/snippets/markov/weights%g.mat',sampleIndex));
     snippet_markov_weights = snippet_markov_weights.w;
     snippet_lsw_weights = load(sprintf('./localdata/snippets/lsw/weights%g.mat',sampleIndex));
-    snippet_lsw_weights = snippet_lsw_weights.w;
 
     %% compute errors
 
@@ -89,12 +91,25 @@ else
                 snippet_markov_error(p,r,n,:) = (abs(predictions-sample_means)./sample_stds);
 
                 % lsw prediction error
-                weights = orbit_lsw_weights{j}(:,r,n);
+                weights = orbit_lsw_weights.w_tikhonov{j}(:,r,n);
                 predictions = orbit_obs_averages(ind,:)'*weights;
-                orbit_lsw_error(p,r,n,:) = (abs(predictions-sample_means)./sample_stds);
-                weights = snippet_lsw_weights{j}(:,r,n);
+                orbit_lsw_tikhonov_error(p,r,n,:) = (abs(predictions-sample_means)./sample_stds);
+                weights = orbit_lsw_weights.w_convex1{j}(:,r,n);
+                predictions = orbit_obs_averages(ind,:)'*weights;
+                orbit_lsw_convex1_error(p,r,n,:) = (abs(predictions-sample_means)./sample_stds);
+                weights = orbit_lsw_weights.w_convex2{j}(:,r,n);
+                predictions = orbit_obs_averages(ind,:)'*weights;
+                orbit_lsw_convex2_error(p,r,n,:) = (abs(predictions-sample_means)./sample_stds);
+
+                weights = snippet_lsw_weights.w_tikhonov{j}(:,r,n);
                 predictions = snippet_obs_averages(ind,:)'*weights;
-                snippet_lsw_error(p,r,n,:) = (abs(predictions-sample_means)./sample_stds);
+                snippet_lsw_tikhonov_error(p,r,n,:) = (abs(predictions-sample_means)./sample_stds);
+                weights = snippet_lsw_weights.w_convex1{j}(:,r,n);
+                predictions = snippet_obs_averages(ind,:)'*weights;
+                snippet_lsw_convex1_error(p,r,n,:) = (abs(predictions-sample_means)./sample_stds);
+                weights = snippet_lsw_weights.w_convex2{j}(:,r,n);
+                predictions = snippet_obs_averages(ind,:)'*weights;
+                snippet_lsw_convex2_error(p,r,n,:) = (abs(predictions-sample_means)./sample_stds);
 
             end
 
@@ -108,7 +123,7 @@ else
 
     %% save out results so that they may be plotted
     filename = sprintf('./localdata/predictions/errors%g.mat',sampleIndex);
-    save(filename,'orbit_lsw_error','orbit_markov_error','orbit_uniform_error','orbit_pot_error','snippet_lsw_error','snippet_markov_error','snippet_uniform_error');
+    save(filename,'orbit_lsw_tikhonov_error','orbit_lsw_convex1_error','orbit_lsw_convex2_error','orbit_markov_error','orbit_uniform_error','orbit_pot_error','snippet_lsw_tikhonov_error','snippet_lsw_convex1_error','snippet_lsw_convex2_error','snippet_markov_error','snippet_uniform_error');
     fprintf('saved results to `%s`\n',filename)
 
 end

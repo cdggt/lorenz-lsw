@@ -43,21 +43,38 @@ else
     load('localdata/snippets/lsw/correlations.mat','K');
     R = size(permutations,2);
     N = numel(Narray);
-    w = cell(P,1);
-    ridgeparameter = 1e-6;
+    w_tikhonov = cell(P,1); % weights using Tihkonov regularization
+    w_convex1 = cell(P,1); % weights using lsqnonneg
+    w_convex2 = cell(P,1); % weights using fmincon
+    ridgeparameter = 1e-10;
     str = '';
     for i = 1:P
 
         p = Parray(i);
         I = eye(p);
-        w{i} = zeros(p,R,N);
+        w_tikhonov{i} = zeros(p,R,N);
+        w_convex1{i} = zeros(p,R,N);
+        w_convex2{i} = zeros(p,R,N);
 
         for r = 1:R
 
             ind = permutations(1:p,r);
             kernel = K(ind,ind);
-            w{i}(:,r,:) = (kernel+ridgeparameter*I) \ averages(ind,:);
 
+            % tikhonov regularized weights
+            w_tikhonov{i}(:,r,:) = (kernel+ridgeparameter*I) \ averages(ind,:);
+
+            for n = 1:N
+
+                % convex method 1
+                w = lsqnonneg(kernel,averages(ind,n));
+                w_convex1{i}(:,r,n) = w/sum(w);
+
+                % convex method 2
+                w_convex2{i}(:,r,n) = fminconvex(kernel,averages(ind,n));
+         
+            end
+            
         end
 
         fprintf(repmat('\b',1,numel(str)));
@@ -67,11 +84,29 @@ else
     end
 
     % save out data
-    save(filename,'w','theta');
+    save(filename,'w_tikhonov','w_convex1','w_convex2','theta');
     fprintf('saved results to `%s`\n',filename)
 
 end
 
 end
 
+function w = fminconvex(A,b)
 
+% Make initial guess
+n = size(A, 2);
+guess = ones(n,1)/n;
+
+% Objective function including the l1 norm penalty
+objective = @(x) 0.5 * norm(A * x - b)^2;
+
+% Constraints: sum(w) = 1 and w >= 0
+Aeq = ones(1, n);
+beq = 1;
+lb = zeros(n, 1);
+
+% Solve using fmincon
+options = optimoptions('fmincon', 'Algorithm', 'sqp','MaxFunctionEvaluations',1e3,'OptimalityTolerance',1e-6,'Display','off');
+w = fmincon(objective, guess, [], [], Aeq, beq, lb, [], [], options);
+
+end
