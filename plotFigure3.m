@@ -119,8 +119,11 @@ plot_center_and_spread(Narray,repmat(orbit_uniform_error(p,:),[numel(Narray),1])
 plot_center_and_spread(Narray,permute(orbit_markov_error(p,:,:,:),[3 2 4 1]),palette{3},.7,'--');
 plot_center_and_spread(Narray,permute(orbit_lsw_error(p,:,:,:),[3 2 4 1]),palette{4},.5,'-');
 
-[~,q] = min(abs(complete_libraries-125));
+q = find(complete_libraries<=p,1,'last');
 yline(orbit_pot_error(complete_libraries(q)),'color',hex2rgb(palette{1}),'LineWidth',2);
+if p~=complete_libraries(q)
+    warning('warning, other methods are being plotted at P=%g, but POT is being plotted for P=5g\n',p,q);
+end
 
 plot(line_xcrds{2},line_ycrds{2},'k-','LineWidth',2)
 
@@ -163,7 +166,8 @@ plot_center_and_spread(Parray,orbit_uniform_error,palette{2},.7,'-.');
 plot_center_and_spread(Parray,permute(orbit_markov_error(:,:,n,:),[1 2 4 3]),palette{3},.7,'--');
 plot_center_and_spread(Parray,permute(orbit_lsw_error(:,:,n,:),[1 2 4 3]),palette{4},.5,'-');
 
-scatter(complete_libraries,orbit_pot_error(complete_libraries),60,'d','filled','CData',hex2rgb(palette{1}),'LineWidth',2);
+isComplete = ismember(Parray,complete_libraries);
+scatter(Parray(isComplete),orbit_pot_error(isComplete),60,'d','filled','CData',hex2rgb(palette{1}),'LineWidth',2);
 
 % format axis
 set(gca,'YScale','log','Xscale','log');
@@ -190,7 +194,8 @@ plot_center_and_spread(Parray,orbit_uniform_error,palette{2},.7,'-.');
 plot_center_and_spread(Parray,permute(orbit_markov_error(:,:,n,:),[1 2 4 3]),palette{3},.7,'--');
 plot_center_and_spread(Parray,permute(orbit_lsw_error(:,:,n,:),[1 2 4 3]),palette{4},.5,'-');
 
-scatter(complete_libraries,orbit_pot_error(complete_libraries),60,'d','filled','CData',hex2rgb(palette{1}),'LineWidth',2);
+isComplete = ismember(Parray,complete_libraries);
+scatter(Parray(isComplete),orbit_pot_error(isComplete),60,'d','filled','CData',hex2rgb(palette{1}),'LineWidth',2);
 
 % format axis
 set(gca,'YScale','log','Xscale','log');

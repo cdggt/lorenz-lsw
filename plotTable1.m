@@ -20,21 +20,28 @@ for s = 1:S
         snippet_lsw_error    = nan(R,Nobs,S);
         table = zeros(Nobs,7);
 
-        orbit_uniform_error   = squeeze(obj.orbit_uniform_error(pindex,:,:));
-        orbit_pot_error       = squeeze(obj.orbit_pot_error(pindex,:,:));
-        snippet_uniform_error = squeeze(obj.snippet_uniform_error(pindex,:,:));
+        % compute errors for given p. Results are [1 x R x Nobs]
+        orbit_uniform_error   = obj.orbit_uniform_error(pindex,:,:);
+        orbit_pot_error       = obj.orbit_pot_error(pindex,:,:);
+        snippet_uniform_error = obj.snippet_uniform_error(pindex,:,:);
 
-        table(:,1) = median(orbit_pot_error,1)';
-        table(:,2) = median(orbit_uniform_error,1)';
-        table(:,5) = median(snippet_uniform_error,1)';
+        % make results [Nobs x R]
+        orbit_uniform_error   = reshape(permute(orbit_uniform_error,[3 2 1]),Nobs,[]);
+        orbit_pot_error       = reshape(permute(orbit_pot_error,[3 2 1]),Nobs,[]);
+        snippet_uniform_error = reshape(permute(snippet_uniform_error,[3 2 1]),Nobs,[]);
+
+        % take median over R
+        table(:,1) = median(orbit_pot_error,2);
+        table(:,2) = median(orbit_uniform_error,2);
+        table(:,5) = median(snippet_uniform_error,2);
 
     end
 
-    orbit_markov_error(:,:,s) = squeeze(obj.orbit_markov_error(pindex,:,nindex,:));
-    snippet_markov_error(:,:,s) = squeeze(obj.snippet_markov_error(pindex,:,nindex,:));
+    orbit_markov_error(:,:,s)   = permute(obj.orbit_markov_error(pindex,:,nindex,:),[2 4 1 3]);
+    snippet_markov_error(:,:,s) = permute(obj.snippet_markov_error(pindex,:,nindex,:),[2 4 1 3]);
 
-    orbit_lsw_error(:,:,s)    = squeeze(obj.orbit_lsw_error(pindex,:,nindex,:));
-    snippet_lsw_error(:,:,s)    = squeeze(obj.snippet_lsw_error(pindex,:,nindex,:));
+    orbit_lsw_error(:,:,s)      = permute(obj.orbit_lsw_tikhonov_error(pindex,:,nindex,:),[2 4 1 3]);
+    snippet_lsw_error(:,:,s)    = permute(obj.snippet_lsw_tikhonov_error(pindex,:,nindex,:),[2 4 1 3]);
     
     fprintf(repmat('\b',1,numel(str)));
     str = sprintf('\t %g / %g \n',s,S);
@@ -42,10 +49,10 @@ for s = 1:S
 
 end
 
-table(:,3) = median(reshape(permute(orbit_markov_error,[2 1 3]),Nobs,[]),2);
-table(:,4) = median(reshape(permute(orbit_lsw_error,[2 1 3]),Nobs,[]),2);
-table(:,6) = median(reshape(permute(snippet_markov_error,[2 1 3]),Nobs,[]),2);
-table(:,7) = median(reshape(permute(snippet_lsw_error,[2 1 3]),Nobs,[]),2);
+table(:,3) = median(reshape(orbit_markov_error,Nobs,[]),2);
+table(:,4) = median(reshape(orbit_lsw_error,Nobs,[]),2);
+table(:,6) = median(reshape(snippet_markov_error,Nobs,[]),2);
+table(:,7) = median(reshape(snippet_lsw_error,Nobs,[]),2);
 
 Erel = log10(table);
 

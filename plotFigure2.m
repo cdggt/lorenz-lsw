@@ -5,8 +5,8 @@ if ~isfile(filename)||(nargin>0&&recompute)
 
     theta = logspace(-1,5,7*4); % the range of theta to investigate
     N = numel(theta);
-    P = 30; % the library size to investiage
-
+    P = 30; % the library size to investigate
+    
     Ko = zeros(P,P,N); % the orbit correlation matrix, K_pq^o
     Ks = zeros(P,P,N); % the snippet correlation matrix, K_pq^s
     K = zeros(P); % a temporary matrix to let the PARFOR loop to work

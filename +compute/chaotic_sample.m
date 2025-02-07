@@ -58,8 +58,7 @@ else
         if toc > 60 || init
             runtime = runtime+toc;
             percentdone = n/N*100;
-            timeleft = (100-percentdone)/percentdone*runtime;
-            fprintf('\t collecting data, %g%% complete (%g min left) \n',round(percentdone), max(timeleft,0));
+            fprintf('\t collecting data, %g%% complete \n',round(percentdone));
             init=false;
             tic;
         end
