@@ -122,7 +122,7 @@ plot_center_and_spread(Narray,permute(orbit_lsw_error(p,:,:,:),[3 2 4 1]),palett
 q = find(complete_libraries<=p,1,'last');
 yline(orbit_pot_error(complete_libraries(q)),'color',hex2rgb(palette{1}),'LineWidth',2);
 if p~=complete_libraries(q)
-    warning('warning, other methods are being plotted at P=%g, but POT is being plotted for P=5g\n',p,q);
+    warning('warning, other methods are being plotted at P=%g, but POT is being plotted for P=%g\n',p,q);
 end
 
 plot(line_xcrds{2},line_ycrds{2},'k-','LineWidth',2)

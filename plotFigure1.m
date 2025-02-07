@@ -46,9 +46,6 @@ if ~isfile(filename)||(nargin>0&&recompute)
 
     end
     
-
-    % compute a sample chaotic trajectory to plot over the histogram
-
     % Compute chaotic density and histogram
     chaotic_trajectory = [5*rand; 5*rand; 20];
     timestep = 2e-3;
@@ -69,20 +66,6 @@ else
     load(filename,'x','z','rho','rho_p','histogram','orbit_trajectory','chaotic_trajectory');
 
 end
-
-%% Compute chaotic density and histogram
-chaotic_trajectory = [5*rand; 5*rand; 20];
-timestep = 2e-3;
-for i = 1:1000
-    chaotic_trajectory(:,1) = lorenz_rk4(chaotic_trajectory(:,1),timestep);
-end
-
-T = 1500; % this makes the chaotic snippet the same length as orbit 19
-for t = 2:T
-    chaotic_trajectory(:,t) = lorenz_rk4(chaotic_trajectory(:,t-1),timestep);
-end
-chaotic_trajectory = chaotic_trajectory';
-save(filename,'-append','chaotic_trajectory');
 
 %% plot panels
 

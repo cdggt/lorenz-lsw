@@ -3,7 +3,7 @@ function table = plotTable1(Parray, R, S, Narray)
 %% load in data of table 
 
 Nobs = 11;
-[~,pindex] = min(abs(Parray-25));
+[~,pindex] = min(abs(Parray-21));
 [~,nindex] = min(abs(Narray-10^6));
 
 str = '';
@@ -14,15 +14,15 @@ for s = 1:S
     if s==1
 
         Nobs = size(obj.orbit_markov_error,4);
-        orbit_markov_error = nan(R,Nobs,S);
-        snippet_markov_error = nan(R,Nobs,S);
-        orbit_lsw_error    = nan(R,Nobs,S);
-        snippet_lsw_error    = nan(R,Nobs,S);
+        orbit_markov_error = nan(Nobs,R,S);
+        snippet_markov_error = nan(Nobs,R,S);
+        orbit_lsw_error    = nan(Nobs,R,S);
+        snippet_lsw_error    = nan(Nobs,R,S);
         table = zeros(Nobs,7);
 
         % compute errors for given p. Results are [1 x R x Nobs]
         orbit_uniform_error   = obj.orbit_uniform_error(pindex,:,:);
-        orbit_pot_error       = obj.orbit_pot_error(pindex,:,:);
+        orbit_pot_error       = obj.orbit_pot_error(pindex,1,:); % only consider \mathcal{L}_1
         snippet_uniform_error = obj.snippet_uniform_error(pindex,:,:);
 
         % make results [Nobs x R]
@@ -37,11 +37,12 @@ for s = 1:S
 
     end
 
-    orbit_markov_error(:,:,s)   = permute(obj.orbit_markov_error(pindex,:,nindex,:),[2 4 1 3]);
-    snippet_markov_error(:,:,s) = permute(obj.snippet_markov_error(pindex,:,nindex,:),[2 4 1 3]);
+    % make results [Nobs x R x S]
+    orbit_markov_error(:,:,s)   = permute(obj.orbit_markov_error(pindex,:,nindex,:),[4 2 1 3]);
+    snippet_markov_error(:,:,s) = permute(obj.snippet_markov_error(pindex,:,nindex,:),[4 2 1 3]);
 
-    orbit_lsw_error(:,:,s)      = permute(obj.orbit_lsw_tikhonov_error(pindex,:,nindex,:),[2 4 1 3]);
-    snippet_lsw_error(:,:,s)    = permute(obj.snippet_lsw_tikhonov_error(pindex,:,nindex,:),[2 4 1 3]);
+    orbit_lsw_error(:,:,s)      = permute(obj.orbit_lsw_tikhonov_error(pindex,:,nindex,:),[4 2 1 3]);
+    snippet_lsw_error(:,:,s)    = permute(obj.snippet_lsw_tikhonov_error(pindex,:,nindex,:),[4 2 1 3]);
     
     fprintf(repmat('\b',1,numel(str)));
     str = sprintf('\t %g / %g \n',s,S);
@@ -49,6 +50,7 @@ for s = 1:S
 
 end
 
+% take median over R and S
 table(:,3) = median(reshape(orbit_markov_error,Nobs,[]),2);
 table(:,4) = median(reshape(orbit_lsw_error,Nobs,[]),2);
 table(:,6) = median(reshape(snippet_markov_error,Nobs,[]),2);
