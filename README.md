@@ -106,7 +106,7 @@ Each element of the weight cell arrays is a $[p\times R\times N_0]$ matrix. The 
 
 where the weight cell arrays are loaded from `weights{s}.mat`.
 
-### Accuracy
+### Error of Each Method
 
 The `/localdata/predictions/` folder contains an `averages.mat` file containing:
 - `orbit_obs_averages`: a $[P_\text{max}\times (B_0+1)]$ matrix of test observable averages over orbits. The first $B_0$ columns correspond to the averages over the elements of $\mathcal{B}$. The very last column is populated with every orbits largest Floquet exponent, $\lambda_p$.  
@@ -130,11 +130,13 @@ The `/localdata/predictions/` folder contains numerous `errors{index}.mat` files
 
 The fields `orbit_pot_error`, `orbit_uniform_error`, and `snippet_uniform_error` are all $[P_0\times R\times (B_0+1)]$ arrays. For a given $p$, $r$, $n$, and $s$, the value of $E_\text{max}$ the POT weights are
 >POT_error = max(orbit_pot_error(p,r,1:end-1))
+
 where `orbit_pot_error` is loaded from `errors{s}.mat`.
 
 Notice that we compute the max only over the elements of $\mathcal{B}$, and not over the Lyanpunov exponent. 
 
 The remaining fields are all $[P_0\times R\times \times N \times (B_0+1)]$ arrays. For a given $p$, $r$, $n$, and $s$, the relative error of, for example, the unconstrained LSW weights are
 >LSW_error = max(orbit_lsw_tikhonov_error(p,r,n,1:end-1))
+
 where `orbit_lsw_tikhonov_error` is loaded from `errors{s}.mat`.
 
