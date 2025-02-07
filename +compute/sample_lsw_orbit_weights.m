@@ -46,7 +46,7 @@ else
     w_tikhonov = cell(P,1); % weights using Tihkonov regularization
     w_convex1 = cell(P,1); % weights using lsqnonneg
     w_convex2 = cell(P,1); % weights using fmincon
-    ridgeparameter = 1e-6;
+    ridgeparameter = 1e-10;
     str = '';
     for i = 1:P
 
