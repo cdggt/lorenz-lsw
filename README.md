@@ -43,7 +43,7 @@ Let lowercase $p$, $r$, $n$, and $s$ denote specific values $p\in$ `Parray`, $n\
 - $N_\text{max}$: the largest value of $N$ in `Narray`. 
 - $P_0$: the number of elements in `Parray`
 - $P_\text{max}$: the total number of known orbits or snippets. Here, $P\text{max}=125$. 
-- $B_0$: the number of observables in $\mathcal{B}$. We use $\mathcal{B} = \{1,x,y,z,x^2,xy,xz,y^2,yz,z^2\}$ such that $B_0=10$.
+- $B_0$: the number of observables in $\mathcal{B}$. We use $\mathcal{B} = [1,x,y,z,x^2,xy,xz,y^2,yz,z^2]$ such that $B_0=10$.
 
 ### trajectory data 
 
@@ -70,7 +70,7 @@ Every snippet .mat file in `/localdata/snippets/` has the following fields:
 ### POT Data 
 
 The `/localdata/orbits/pot/` folder contains a file `weights.mat`. This file  has fields:
-- `w`: a $\{P_0\times 1\}$ cell array containing periodic orbit weights computed at each $p$
+- `w`: a $[P_0\times 1]$ cell array containing periodic orbit weights computed at each $p$
 
 Each element of the `w` cell array is a $[p\times R]$ matrix. For a given $p$ and $r$, the POT weights are
 >pot_weights = w{p}(:,r)
@@ -80,7 +80,7 @@ Since POT weights do not depend on the chaotic trajectory, the weights do not va
 ### Markov Data 
 
 The `/localdata/{orbits,snippets}/markov/` folders each have numerous `weights{index}.mat` files, one for each value of $s$. Each file pertains to a specific chaotic trajectory. Each file contains the following fields :
-- `w`: a $\{\#_P\times 1\}$ cell array containing the Markov weights for each library size $P$ in `Parray`
+- `w`: a $[P_0\times 1]$ cell array containing the Markov weights for each library size $P$ in `Parray`
 
 Each element of the `w` cell array is a $[p\times R\times N_0]$ matrix. The Markov weights computed for a given $p$, $r$, $n$, and $s$ are 
 >markov_weights = w{p}(:,r,n)
@@ -95,9 +95,9 @@ The `/localdata/{orbits,snippets}/lsw/` folders each have a `correlations.mat` f
 
 The `/localdata/{orbits,snippets}/lsw/` folders each have numerous `weights{index}.mat` files, one for each value of $s$. Each file pertains to a specific chaotic trajectory. Each file contains the following fields :
 - `theta`: the Gaussian kernel variance used to compute the LSW weights
-- `w_tikhonov`: a $\{P_\text{max}\times 1\}$ cell array containing the LSW weights, computed using Tikhonov regularization, for each library size $P$
-- `w_convex1`: a $\{P_\text{max}\times 1\}$ cell array containing the LSW weights, computed using Matlab's $\verb|lsqnonneg|$, for each library size $P$
-- `w_convex2`: a $\{P_\text{max}\times 1\}$ cell array containing the LSW weights, computed using Matlab's $\verb|fmincon|$, for each library size $P$
+- `w_tikhonov`: a $[P_\text{max}\times 1]$ cell array containing the LSW weights, computed using Tikhonov regularization, for each library size $P$
+- `w_convex1`: a $[P_\text{max}\times 1]$ cell array containing the LSW weights, computed using Matlab's $\verb|lsqnonneg|$, for each library size $P$
+- `w_convex2`: a $[P_\text{max}\times 1]$ cell array containing the LSW weights, computed using Matlab's $\verb|fmincon|$, for each library size $P$
 
 Each element of the weight cell arrays is a $[p\times R\times N_0]$ matrix. The LSW weights computed for a given $p$, $r$, $n$, and $s$ are 
 >lsw_weights_unconstrained = w_tikhonov{p}(:,r,n)\
