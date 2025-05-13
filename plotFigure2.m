@@ -41,7 +41,7 @@ if ~isfile(filename)||(nargin>0&&recompute)
 
                 % compute the integral of the Gaussian kernel
                 distance = (orbitp.x-orbitq.x').^2+(orbitp.y-orbitq.y').^2+(orbitp.z-orbitq.z').^2;
-                G = exp(-1/(4*th).*distance);
+                G = (2*pi*th)^(-3/2)*exp(-1/(4*th).*distance);
                 K(p,q) = compute.orbit_mean(compute.orbit_mean(G,2),1);
 
             end

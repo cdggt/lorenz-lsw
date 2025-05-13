@@ -38,15 +38,6 @@ Narray = 10.^(1:6); % the choatic trajectory durations to consider when computin
 seed = 123; % this is the seed we used to generate the values in the paper
 rng(seed);
 
-%% compute the library permutations, {P_r}, explicitly 
-
-permutations = (1:Pmax);
-while size(permutations,1)<R
-    permutations(end+1,:) = randperm(Pmax);
-    permutations = unique(permutations,'rows');
-end
-permutations = permutations';
-
 %% generate a snippet library to match Viswanaths orbit library
 
 compute.snippet_library(Pmax,seed);
@@ -62,7 +53,7 @@ compute.orbit_correlations(recompute,theta,Pmax); % orbits
 compute.snippet_correlations(recompute,theta,Pmax); % snippets
 
 % compute periodic orbit weights
-compute.pot_orbit_weights(recompute,Parray,permutations);
+compute.pot_orbit_weights(recompute,Parray);
 
 for sampleIndex = 1:S
 
@@ -70,12 +61,12 @@ for sampleIndex = 1:S
     compute.chaotic_sample(recompute,sampleIndex,seed,max(Narray));
 
     % compute lsw weights, for this sample, over all p in Parray, n in Narray, and r = 1,...,R
-    compute.sample_lsw_orbit_weights(recompute,sampleIndex,Parray,Narray,permutations,theta); % orbits
-    compute.sample_lsw_snippet_weights(recompute,sampleIndex,Parray,Narray,permutations,theta); % snippets 
+    compute.sample_lsw_orbit_weights(recompute,sampleIndex,Parray,Narray,theta); % orbits
+    compute.sample_lsw_snippet_weights(recompute,sampleIndex,Parray,Narray,theta); % snippets 
 
     % compute markove weights, for this sample, over all p in Parray, n in Narray, and r = 1,...,R
-    compute.sample_markov_orbit_weights(recompute,sampleIndex,Parray,Narray,permutations); % orbits
-    compute.sample_markov_snippet_weights(recompute,sampleIndex,Parray,Narray,permutations); % snippets
+    compute.sample_markov_orbit_weights(recompute,sampleIndex,Parray,Narray); % orbits
+    compute.sample_markov_snippet_weights(recompute,sampleIndex,Parray,Narray); % snippets
 
 end
 
@@ -93,7 +84,7 @@ observables = {
     @(x,y,z) y.*z, ...
     @(x,y,z) z.*z ...
     % compute.observable_averages will also append the lyapunov exponent
-    % "observable" to this list.
+    % and Kaplan-Yorke dimension "observables" to this list.
 };
 compute.observable_averages(recompute,observables,Pmax,S)
 
@@ -101,13 +92,13 @@ compute.observable_averages(recompute,observables,Pmax,S)
 
 % compute E_rel for each observable, over each chaotic sample individually
 for sampleIndex = 1:S
-    compute.sample_prediction_errors(recompute,sampleIndex,Parray,Narray,permutations);
+    compute.sample_prediction_errors(recompute,sampleIndex,Parray,Narray);
 end
 
 %% plot Figures
 
 plotFigure1(recompute);
 plotFigure2(recompute);
-plotFigure3(Parray, R, S, Narray);
+plotFigure3(Parray, R, S, Narray); 
 plotFigure4(Parray, R, S, Narray);
 plotTable1(Parray, R, S, Narray);

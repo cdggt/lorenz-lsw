@@ -1,4 +1,4 @@
-function sample_lsw_orbit_weights(recompute,sampleNumber,Parray,Narray,permutations,theta)
+function sample_lsw_orbit_weights(recompute,sampleNumber,Parray,Narray,theta)
 %SAMPLE_LSW_ORBIT_WEIGHTS this method computes the LSW weights of orbits,
 %for each P, R, and N, at a specific sample index S=sampleIndex. 
 
@@ -10,6 +10,8 @@ if isfile(filename)&&~recompute
 else
 
     fprintf('computing orbit lsw averages from the sample number %g...\n',sampleNumber)
+
+    load('data/library_permutations.mat','permutations');
 
     % load in chaotic sample trajectory
     sample = load(['./localdata/chaos/sample',num2str(sampleNumber),'.mat'],'x','y','z');

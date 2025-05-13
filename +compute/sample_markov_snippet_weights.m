@@ -1,4 +1,4 @@
-function sample_markov_snippet_weights(recompute,sampleNumber,Parray,Narray,permutations)
+function sample_markov_snippet_weights(recompute,sampleNumber,Parray,Narray)
 %SAMPLE_MARKOV_SNIPPET_WEIGHTS this method computes the Markov weights of 
 % snippets, for each P, R, and N, at a specific sample index S=sampleIndex. 
 
@@ -14,6 +14,8 @@ sample = load(['./localdata/chaos/sample',num2str(sampleNumber),'.mat'],'x','y',
 sample = [sample.x' sample.y' sample.z'];
 
 fprintf('computing snippet Markov averages for sample number %g...\n',sampleNumber)
+
+load('data/library_permutations.mat','permutations');
 
 % allocate memory for arrays
 Pmax = numel(Parray);

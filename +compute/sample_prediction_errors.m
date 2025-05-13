@@ -1,4 +1,4 @@
-function sample_prediction_errors(recompute,sampleIndex,Parray,Narray,permutations)
+function sample_prediction_errors(recompute,sampleIndex,Parray,Narray)
 %SAMPLE_PREDICTIONS_ERRORS this method computes takes the weights, which 
 % have been saves out, and computes E_rel for each weighting scheme, over 
 % each value of P, R, and N, at a specific value of S=sampleIndex. 
@@ -12,6 +12,7 @@ if isfile(filename)&&~recompute
 else
 
     fprintf('computing errors...\n')
+    load('data/library_permutations.mat','permutations');
     load('localdata/predictions/averages.mat','orbit_obs_averages','snippet_obs_averages','sample_obs_averages','sample_obs_variances');
     % for each observable, get aggegrate average and std, over all S
     sample_means = mean(sample_obs_averages,1)';

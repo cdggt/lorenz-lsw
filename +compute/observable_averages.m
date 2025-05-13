@@ -17,8 +17,8 @@ else
     %% compute the average of each observable over each orbit and each snippet
 
     nObs = numel(observables);
-    orbit_obs_averages = zeros(Pmax,nObs+1);
-    snippet_obs_averages = zeros(Pmax,nObs+1);
+    orbit_obs_averages = zeros(Pmax,nObs+2);
+    snippet_obs_averages = zeros(Pmax,nObs+2);
 
     str = '';
     for p = 1:Pmax
@@ -29,16 +29,21 @@ else
             obs = observables{o}(orbit.x,orbit.y,orbit.z);
             orbit_obs_averages(p,o) = compute.orbit_mean(obs);
         end
+        lambda = orbit.floquetexponent;
         % add lyapunov exponent as an extra column
-        orbit_obs_averages(p,nObs+1) = orbit.floquetexponent;
+        orbit_obs_averages(p,nObs+1) = lambda;
+        % add Kaplan-Yorke dimension as an extra column
+        orbit_obs_averages(p,nObs+2) = 2+lambda/(lambda+10+8/3+1);
 
         snippet = load(sprintf('localdata/snippets/snippet%g.mat',p),'x','y','z','period');
         for o = 1:nObs
             obs = observables{o}(snippet.x,snippet.y,snippet.z);
             snippet_obs_averages(p,o) = compute.snippet_mean(obs,1);
         end
-        % add nan as an extra column
+        % add nan as an extra column for lyapunov exponent
         snippet_obs_averages(p,nObs+1) = nan;
+        % add nan as an extra column for Kaplan-Yorke dimension
+        snippet_obs_averages(p,nObs+2) = nan;
 
         fprintf(repmat('\b',1,numel(str)));
         str = sprintf('\t %g / %g \n',p,Pmax);
@@ -48,8 +53,8 @@ else
 
     %% compute the average of each observable over each chaotic sample
 
-    sample_obs_averages = zeros(Smax,nObs+1);
-    sample_obs_variances = zeros(Smax,nObs+1);
+    sample_obs_averages = zeros(Smax,nObs+2);
+    sample_obs_variances = zeros(Smax,nObs+2);
     str = '';
     for s = 1:Smax
 
@@ -62,6 +67,9 @@ else
         % add lyapunov exponent as an extra column
         sample_obs_averages(s,nObs+1) = 0.90566;
         sample_obs_variances(s,nObs+1) = 1;
+        % add Kaplan-Yorke dimension as an extra column
+        sample_obs_averages(s,nObs+2) = 2.0627160;
+        sample_obs_variances(s,nObs+2) = 1;
 
         fprintf(repmat('\b',1,numel(str)));
         str = sprintf('\t %g / %g \n',s,Smax);
