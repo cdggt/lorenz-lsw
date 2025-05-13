@@ -105,14 +105,14 @@ exportgraphics(gcf,'media/fig4f.pdf','ContentType','vector');
 
 weights = cell(5,1);
 p = 125;
-s = 1;
+r = 1;
 n = 6;
 obj=load('localdata/orbits/pot/weights.mat');
-weights{1}=obj.w{p}(1:p);
+weights{1}=obj.w{p}(:,r);
 obj=load('localdata/orbits/markov/weights1.mat');
-weights{2}=obj.w{p}(:,s,n);
+weights{2}=obj.w{p}(:,r,n);
 obj=load('localdata/orbits/lsw/weights1.mat');
-weights(3:5) = {obj.w_tikhonov{p}(:,s,n), obj.w_convex1{p}(:,s,n), obj.w_convex2{p}(:,s,n)};
+weights(3:5) = {obj.w_tikhonov{p}(:,r,n), obj.w_convex1{p}(:,r,n), obj.w_convex2{p}(:,r,n)};
 clear obj;
 ytiks = [
     0 0.02 0.04;
@@ -180,13 +180,13 @@ weights = cell(5,1);
 for i = 1:5
 weights{i} = nan(125);
 end
-s = 1;
+r = 1;
 n = 6;
 obj=load('localdata/orbits/pot/weights.mat');
 complete_libraries = [1 3 6 12 21 39 69 125];
 for p = 1:125
     if ismember(p,[1 3 6 12 21 39 69 125])
-        weights{1}(p,1:p)=obj.w{p}(1:p);
+        weights{1}(p,1:p)=obj.w{p}(:,r);
         weights{1}(p,1:p)=weights{1}(p,1:p)/max(abs(weights{1}(p,1:p)));
     else
         q = find(p>complete_libraries,1,'last');
@@ -197,14 +197,14 @@ for p = 1:125
 end
 obj=load('localdata/orbits/markov/weights1.mat');
 for p = 1:125
-weights{2}(p,1:p)=obj.w{p}(:,s,n);
+weights{2}(p,1:p)=obj.w{p}(:,r,n);
 weights{2}(p,1:p)=weights{2}(p,1:p)/max(abs(weights{2}(p,1:p)));
 end
 obj=load('localdata/orbits/lsw/weights1.mat');
 for p = 1:125
-weights{3}(p,1:p)=obj.w_tikhonov{p}(:,s,n);
-weights{4}(p,1:p)=obj.w_convex1{p}(:,s,n);
-weights{5}(p,1:p)=obj.w_convex2{p}(:,s,n);
+weights{3}(p,1:p)=obj.w_tikhonov{p}(:,r,n);
+weights{4}(p,1:p)=obj.w_convex1{p}(:,r,n);
+weights{5}(p,1:p)=obj.w_convex2{p}(:,r,n);
 weights{3}(p,1:p)=weights{3}(p,1:p)/max(abs(weights{3}(p,1:p)));
 weights{4}(p,1:p)=weights{4}(p,1:p)/max(abs(weights{4}(p,1:p)));
 weights{5}(p,1:p)=weights{5}(p,1:p)/max(abs(weights{5}(p,1:p)));
