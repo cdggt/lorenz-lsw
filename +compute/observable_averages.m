@@ -30,20 +30,24 @@ else
             orbit_obs_averages(p,o) = compute.orbit_mean(obs);
         end
         lambda = orbit.floquetexponent;
-        % add lyapunov exponent as an extra column
+        % add unstable lyapunov exponent as an extra column
         orbit_obs_averages(p,nObs+1) = lambda;
+        % add stable lyapunov exponent as an extra column
+        orbit_obs_averages(p,nObs+2) = -(lambda+10+8/3+1);
         % add Kaplan-Yorke dimension as an extra column
-        orbit_obs_averages(p,nObs+2) = 2+lambda/(lambda+10+8/3+1);
+        orbit_obs_averages(p,nObs+3) = nan;
 
         snippet = load(sprintf('localdata/snippets/snippet%g.mat',p),'x','y','z','period');
         for o = 1:nObs
             obs = observables{o}(snippet.x,snippet.y,snippet.z);
             snippet_obs_averages(p,o) = compute.snippet_mean(obs,1);
         end
-        % add nan as an extra column for lyapunov exponent
+        % add nan as an extra column for unstable lyapunov exponent
         snippet_obs_averages(p,nObs+1) = nan;
-        % add nan as an extra column for Kaplan-Yorke dimension
+        % add nan as an extra column for stable lyapunov exponent
         snippet_obs_averages(p,nObs+2) = nan;
+        % add nan as an extra column for Kaplan-Yorke dimension
+        snippet_obs_averages(p,nObs+3) = nan;
 
         fprintf(repmat('\b',1,numel(str)));
         str = sprintf('\t %g / %g \n',p,Pmax);
@@ -64,12 +68,15 @@ else
             sample_obs_averages(s,o) = mean(obs);
             sample_obs_variances(s,o) = var(obs);
         end
-        % add lyapunov exponent as an extra column
+        % add unstable lyapunov exponent as an extra column
         sample_obs_averages(s,nObs+1) = 0.90566;
-        sample_obs_variances(s,nObs+1) = 1;
-        % add Kaplan-Yorke dimension as an extra column
-        sample_obs_averages(s,nObs+2) = 2.0627160;
-        sample_obs_variances(s,nObs+2) = 1;
+        sample_obs_variances(s,nObs+1) = 0;
+        % add stable lyapunov exponent as an extra column
+        sample_obs_averages(s,nObs+2) = -14.57233;
+        sample_obs_variances(s,nObs+2) = 0;
+        % add stable lyapunov exponent as an extra column
+        sample_obs_averages(s,nObs+3) = 2.062149;
+        sample_obs_variances(s,nObs+3) = 0;
 
         fprintf(repmat('\b',1,numel(str)));
         str = sprintf('\t %g / %g \n',s,Smax);
