@@ -1,4 +1,4 @@
-function sample_prediction_errors(recompute,sampleIndex,Parray,Narray,permutations)
+function sample_prediction_errors(recompute,sampleIndex,Parray,Narray)
 %SAMPLE_PREDICTIONS_ERRORS this method computes takes the weights, which 
 % have been saves out, and computes E_rel for each weighting scheme, over 
 % each value of P, R, and N, at a specific value of S=sampleIndex. 
@@ -12,13 +12,17 @@ if isfile(filename)&&~recompute
 else
 
     fprintf('computing errors...\n')
+    load('data/library_permutations.mat','permutations');
     load('localdata/predictions/averages.mat','orbit_obs_averages','snippet_obs_averages','sample_obs_averages','sample_obs_variances');
     % for each observable, get aggegrate average and std, over all S
     sample_means = mean(sample_obs_averages,1)';
     sample_stds = sqrt(mean(sample_obs_variances,1))';
 
     % make sure that means that are analytically zero are actually zero
-    sample_means(mean(sample_obs_averages,1)<(10^6)^(-1/2))=0;
+    sample_means(2)=0; % x
+    sample_means(3)=0; % y
+    sample_means(7)=0; % xz
+    sample_means(9)=0; % yz
     
     % set observables with no variance to have a variance of 1
     sample_stds(sample_stds==0)=1;
@@ -71,12 +75,16 @@ else
             % pot prediction error 
             weights = orbit_pot_weights{j}(:,r);
             predictions = orbit_obs_averages(ind,:)'*weights;
+            predictions(end) = 2-predictions(end-2)/predictions(end-1); % update last prediction to be that of d_ky
             orbit_pot_error(p,r,:) = abs(predictions-sample_means)./sample_stds;
 
             % uniform prediction error 
             predictions = mean(orbit_obs_averages(ind,:),1)';
+            predictions(end) = 2-predictions(end-2)/predictions(end-1); % update last prediction to be that of d_ky
             orbit_uniform_error(p,r,:) = abs(predictions-sample_means)./sample_stds;
+            
             predictions = mean(snippet_obs_averages(ind,:),1)';
+            predictions(end) = 2-predictions(end-2)/predictions(end-1); % update last prediction to be that of d_ky
             snippet_uniform_error(p,r,:) = abs(predictions-sample_means)./sample_stds;
 
             % for every sample duration
@@ -85,30 +93,38 @@ else
                 % markov prediction error
                 weights = orbit_markov_weights{j}(:,r,n);
                 predictions = orbit_obs_averages(ind,:)'*weights;
+                predictions(end) = 2-predictions(end-2)/predictions(end-1); % update last prediction to be that of d_ky
                 orbit_markov_error(p,r,n,:) = (abs(predictions-sample_means)./sample_stds);
                 weights = snippet_markov_weights{j}(:,r,n);
                 predictions = snippet_obs_averages(ind,:)'*weights;
+                predictions(end) = 2-predictions(end-2)/predictions(end-1); % update last prediction to be that of d_ky
                 snippet_markov_error(p,r,n,:) = (abs(predictions-sample_means)./sample_stds);
 
                 % lsw prediction error
                 weights = orbit_lsw_weights.w_tikhonov{j}(:,r,n);
                 predictions = orbit_obs_averages(ind,:)'*weights;
+                predictions(end) = 2-predictions(end-2)/predictions(end-1); % update last prediction to be that of d_ky
                 orbit_lsw_tikhonov_error(p,r,n,:) = (abs(predictions-sample_means)./sample_stds);
                 weights = orbit_lsw_weights.w_convex1{j}(:,r,n);
                 predictions = orbit_obs_averages(ind,:)'*weights;
+                predictions(end) = 2-predictions(end-2)/predictions(end-1); % update last prediction to be that of d_ky
                 orbit_lsw_convex1_error(p,r,n,:) = (abs(predictions-sample_means)./sample_stds);
                 weights = orbit_lsw_weights.w_convex2{j}(:,r,n);
                 predictions = orbit_obs_averages(ind,:)'*weights;
+                predictions(end) = 2-predictions(end-2)/predictions(end-1); % update last prediction to be that of d_ky
                 orbit_lsw_convex2_error(p,r,n,:) = (abs(predictions-sample_means)./sample_stds);
 
                 weights = snippet_lsw_weights.w_tikhonov{j}(:,r,n);
                 predictions = snippet_obs_averages(ind,:)'*weights;
+                predictions(end) = 2-predictions(end-2)/predictions(end-1); % update last prediction to be that of d_ky
                 snippet_lsw_tikhonov_error(p,r,n,:) = (abs(predictions-sample_means)./sample_stds);
                 weights = snippet_lsw_weights.w_convex1{j}(:,r,n);
                 predictions = snippet_obs_averages(ind,:)'*weights;
+                predictions(end) = 2-predictions(end-2)/predictions(end-1); % update last prediction to be that of d_ky
                 snippet_lsw_convex1_error(p,r,n,:) = (abs(predictions-sample_means)./sample_stds);
                 weights = snippet_lsw_weights.w_convex2{j}(:,r,n);
                 predictions = snippet_obs_averages(ind,:)'*weights;
+                predictions(end) = 2-predictions(end-2)/predictions(end-1); % update last prediction to be that of d_ky
                 snippet_lsw_convex2_error(p,r,n,:) = (abs(predictions-sample_means)./sample_stds);
 
             end

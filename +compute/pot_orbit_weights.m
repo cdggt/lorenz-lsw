@@ -1,4 +1,4 @@
-function pot_orbit_weights(recompute,Parray,permutations)
+function pot_orbit_weights(recompute,Parray)
 %POT_ORBIT_WEIGHTS this method computes the POT weights for each library
 %P_r. This method is mostly a wrapper for the function 
 % compute.unordered_pot_weights(ind), which actually computes the POT
@@ -12,6 +12,8 @@ if isfile(filename)&&~recompute
 else
 
     fprintf('computing POT weights...\n')
+
+    load('data/library_permutations.mat','permutations');
 
     P = numel(Parray);
     R = size(permutations,2);

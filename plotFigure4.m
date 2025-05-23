@@ -17,15 +17,15 @@ for s = 1:S
     obj=load(sprintf('localdata/predictions/errors%g.mat',s));
 
     if s==1
-        orbit_pot_error = max(obj.orbit_pot_error(:,:,1:end-1),[],3); % *_error(:,:,end) is the lyapunov exp err. Lets throw away this obs to compute E_max over \mathcal{B}
+        orbit_pot_error = max(obj.orbit_pot_error(:,:,1:end-3),[],3); % *_error(:,:,end-2:end) is the lyapunov exps and KY dim. err. Lets throw away this obs to compute E_max over \mathcal{B}
         orbit_pot_error = orbit_pot_error(:,1); % look only at the ordered library P_r = {1,...,P}. 
     end
 
-    orbit_lsw_tikhonov_error(:,:,:,s)= max(obj.orbit_lsw_tikhonov_error(:,:,:,1:end-1),[],4); % *_error(:,:,:,end) is the lyapunov exp err. Lets throw away this obs to compute E_max over \mathcal{B}
-    orbit_lsw_convex1_error(:,:,:,s) = max(obj.orbit_lsw_convex1_error(:,:,:,1:end-1),[],4);
-    orbit_lsw_convex2_error(:,:,:,s) = max(obj.orbit_lsw_convex2_error(:,:,:,1:end-1),[],4);
+    orbit_lsw_tikhonov_error(:,:,:,s)= max(obj.orbit_lsw_tikhonov_error(:,:,:,1:end-3),[],4); 
+    orbit_lsw_convex1_error(:,:,:,s) = max(obj.orbit_lsw_convex1_error(:,:,:,1:end-3),[],4);
+    orbit_lsw_convex2_error(:,:,:,s) = max(obj.orbit_lsw_convex2_error(:,:,:,1:end-3),[],4);
 
-    orbit_markov_error(:,:,:,s) = max(obj.orbit_markov_error(:,:,:,1:end-1),[],4);
+    orbit_markov_error(:,:,:,s) = max(obj.orbit_markov_error(:,:,:,1:end-3),[],4);
 
     fprintf(repmat('\b',1,numel(str)));
     str = sprintf('\t %g / %g \n',s,S);
@@ -80,8 +80,7 @@ plot_center_and_spread(Parray,permute(orbit_lsw_tikhonov_error(:,:,n,:),[1 2 4 3
 plot_center_and_spread(Parray,permute(orbit_lsw_convex1_error(:,:,n,:),[1 2 4 3]),palette{4},.5,'-');
 plot_center_and_spread(Parray,permute(orbit_lsw_convex2_error(:,:,n,:),[1 2 4 3]),palette{5},.5,'-');
 
-isComplete = ismember(Parray,complete_libraries);
-scatter(Parray(isComplete),orbit_pot_error(isComplete),60,'d','filled','CData',hex2rgb(palette{1}),'LineWidth',2);
+scatter(complete_libraries,orbit_pot_error(complete_libraries),110,'d','filled','CData',hex2rgb(palette{1}),'LineWidth',2);
 
 % format axis
 
@@ -105,9 +104,9 @@ exportgraphics(gcf,'media/fig4f.pdf','ContentType','vector');
 %% plot panels of weights at $P=125$ over each method
 
 weights = cell(5,1);
-p = max(Parray);
+p = 125;
 r = 1;
-n = numel(Narray);
+n = 6;
 obj=load('localdata/orbits/pot/weights.mat');
 weights{1}=obj.w{p}(:,r);
 obj=load('localdata/orbits/markov/weights1.mat');
@@ -158,10 +157,10 @@ if i == 5
 coeff = polyfit(l,w,1);
 what = polyval(coeff,[0.78 1]);
 plot([0.78 1],what,'k--','LineWidth',2);
-text(.9, .025,['$w_p = ',sprintf('%.3f',coeff(1)),'\lambda_p + ',sprintf('%.3f',coeff(2)),'$'],'interpreter','latex','FontSize',24,'HorizontalAlignment','center')
+text(.9, .025,['$w_p = ',sprintf('%.3f',coeff(1)),'\lambda_p^1 + ',sprintf('%.3f',coeff(2)),'$'],'interpreter','latex','FontSize',24,'HorizontalAlignment','center')
 end
 
-xlabel('$\lambda_p$');
+xlabel('$\lambda_p^1$');
 % xticks([1 p]);
 ylabel('$w_p$');
 axis square
@@ -177,16 +176,15 @@ end
 
 %% plot panels of weights over P over each method
 
-Pmax = max(Parray);
 weights = cell(5,1);
 for i = 1:5
-weights{i} = nan(Pmax);
+weights{i} = nan(125);
 end
 r = 1;
 n = 6;
 obj=load('localdata/orbits/pot/weights.mat');
 complete_libraries = [1 3 6 12 21 39 69 125];
-for p = 1:Pmax
+for p = 1:125
     if ismember(p,[1 3 6 12 21 39 69 125])
         weights{1}(p,1:p)=obj.w{p}(:,r);
         weights{1}(p,1:p)=weights{1}(p,1:p)/max(abs(weights{1}(p,1:p)));
@@ -198,12 +196,12 @@ for p = 1:Pmax
     end
 end
 obj=load('localdata/orbits/markov/weights1.mat');
-for p = 1:Pmax
+for p = 1:125
 weights{2}(p,1:p)=obj.w{p}(:,r,n);
 weights{2}(p,1:p)=weights{2}(p,1:p)/max(abs(weights{2}(p,1:p)));
 end
 obj=load('localdata/orbits/lsw/weights1.mat');
-for p = 1:Pmax
+for p = 1:125
 weights{3}(p,1:p)=obj.w_tikhonov{p}(:,r,n);
 weights{4}(p,1:p)=obj.w_convex1{p}(:,r,n);
 weights{5}(p,1:p)=obj.w_convex2{p}(:,r,n);
@@ -225,7 +223,7 @@ set(groot,'DefaultLegendInterpreter','latex')
 % draw gray background denoting invalid cells
 fill([0 P+1 P+1 0 0],[0 0 P+1 P+1 0],[1 1 1]*.8,'EdgeColor','none');
 hold on
-imagesc(weights{i},'AlphaData',~isnan(weights{i}));
+imagesc(weights{i}','AlphaData',~isnan(weights{i}'));
 xticks([1 P]);
 ylabel('$\hat{w}_p$');
 yticks([1 P]);

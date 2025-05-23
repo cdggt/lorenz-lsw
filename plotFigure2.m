@@ -28,7 +28,7 @@ if ~isfile(filename)||(nargin>0&&recompute)
     for i=1:N
 
         th = theta(i);
-
+       
         % orbits
         for p = 1:P
 
